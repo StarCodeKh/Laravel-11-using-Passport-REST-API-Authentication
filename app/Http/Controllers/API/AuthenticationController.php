@@ -10,14 +10,14 @@ use Carbon\Carbon;
 use Auth;
 use Hash;
 
-class AuthController extends Controller
+class AuthenticationController extends Controller
 {
     /** register new account */
     public function register(Request $request)
     {
         $request->validate([
             'name'     => 'required|min:4',
-            'email'    => 'required|email',
+            'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|min:8',
         ]);
  
@@ -40,7 +40,6 @@ class AuthController extends Controller
     /**
      * Login Req
      */
-    /** log in */
     public function login(Request $request)
     {
         $request->validate([
@@ -59,17 +58,17 @@ class AuthController extends Controller
                 $accessToken = $user->createToken($user->email)->accessToken;
     
                 $data = [];
-                $data['response_code']  = '200';
-                $data['status']         = 'success';
-                $data['message']        = 'success Login';
-                $data['user_infor']     = $user;
-                $data['token']          = $accessToken;
+                $data['response_code'] = '200';
+                $data['status']        = 'success';
+                $data['message']       = 'success Login';
+                $data['user_info']     = $user;
+                $data['token']         = $accessToken;
                 return response()->json($data);
             } else {
                 $data = [];
                 $data['response_code']  = '401';
                 $data['status']         = 'error';
-                $data['message']        = 'Unauthorised';
+                $data['message']        = 'Unauthorized';
                 return response()->json($data);
             }
         } catch(\Exception $e) {
